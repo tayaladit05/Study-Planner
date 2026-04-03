@@ -113,7 +113,7 @@ const generatePlan = (goalId, topics, startDate, totalDays, hoursPerDay) => {
     recommendation: feasible
       ? "Plan generated successfully within your current timeline."
       : {
-          message: "Some topics could not fit in the current plan window.",
+          message: `These least-priority topics could not fit in the current plan: ${unscheduledTopics.map((topic) => topic.topic).join(", ")}. If you want to include them in your target, try increasing the deadline or time per day.`,
           additionalHoursNeeded,
           suggestedMinimumHoursPerDay: +(totalRequestedHours / totalDays).toFixed(2),
           suggestedAdditionalDays: Math.ceil(additionalHoursNeeded / hoursPerDay)

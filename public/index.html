@@ -19,11 +19,6 @@
         </label>
 
         <label>
-          Topics (one per line: Topic Name | Hours Needed | Priority)
-          <textarea id="topics" rows="6" required placeholder="Polity Basics | 4 | high&#10;History Modern | 3 | medium&#10;CSAT Practice | 2 | low"></textarea>
-        </label>
-
-        <label>
           Total Days
           <input type="number" id="totalDays" min="1" required />
         </label>
@@ -32,6 +27,12 @@
           Hours Per Day
           <input type="number" id="hoursPerDay" min="1" step="0.5" required />
         </label>
+
+        <fieldset>
+          <legend>Topics</legend>
+          <div id="topicsList"></div>
+          <button type="button" id="addTopicBtn">+ Add Topic</button>
+        </fieldset>
 
         <button type="submit">Create Goal</button>
       </form>

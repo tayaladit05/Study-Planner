@@ -29,7 +29,8 @@ label {
 
 input,
 textarea,
-button {
+button,
+select {
   font: inherit;
   padding: 8px;
   border: 1px solid #000;
@@ -40,6 +41,34 @@ button {
 button {
   cursor: pointer;
   width: fit-content;
+}
+
+fieldset {
+  border: 1px solid #000;
+  padding: 12px;
+  margin: 8px 0;
+}
+
+legend {
+  padding: 0 8px;
+}
+
+.topic-entry {
+  display: grid;
+  grid-template-columns: 1fr 120px 120px 80px;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px;
+  border: 1px solid #ccc;
+}
+
+.topic-entry input,
+.topic-entry select {
+  margin: 0;
+}
+
+.topic-entry button {
+  width: 100%;
 }
 
 .actions {

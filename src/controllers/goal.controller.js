@@ -49,7 +49,7 @@ const createGoal = async (req, res) => {
     res.status(201).json({
       message: plan.summary.feasible
         ? "Goal created and realistic plan generated"
-        : "Goal created with fallback plan. Some topics could not be fully scheduled.",
+        : plan.summary.recommendation.message,
       goal,
       planSummary: plan.summary
     });

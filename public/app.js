@@ -10,28 +10,63 @@ const loadTasksBtn = document.getElementById("loadTasksBtn");
 const loadTodayBtn = document.getElementById("loadTodayBtn");
 const loadPerformanceBtn = document.getElementById("loadPerformanceBtn");
 const redistributeBtn = document.getElementById("redistributeBtn");
+const topicsList = document.getElementById("topicsList");
+const addTopicBtn = document.getElementById("addTopicBtn");
 
 let currentGoal = null;
+let topics = [];
+let topicIdCounter = 0;
 
-function parseTopicsInput(raw) {
-  return raw
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const parts = line.split("|").map((part) => part.trim());
+function renderTopics() {
+  topicsList.innerHTML = "";
+  
+  if (topics.length === 0) {
+    topicsList.innerHTML = "<p>No topics added yet.</p>";
+    return;
+  }
 
-      if (parts.length === 1) {
-        return { name: parts[0], hoursNeeded: 1, priority: "medium" };
-      }
+  topics.forEach((topic) => {
+    const div = document.createElement("div");
+    div.className = "topic-entry";
+    div.innerHTML = `
+      <input type="text" placeholder="Topic name" value="${topic.name}" data-field="name" data-id="${topic.id}" />
+      <input type="number" min="0.25" step="0.25" placeholder="Hours" value="${topic.hoursNeeded}" data-field="hoursNeeded" data-id="${topic.id}" />
+      <select data-field="priority" data-id="${topic.id}">
+        <option value="low" ${topic.priority === "low" ? "selected" : ""}>Low</option>
+        <option value="medium" ${topic.priority === "medium" ? "selected" : ""}>Medium</option>
+        <option value="high" ${topic.priority === "high" ? "selected" : ""}>High</option>
+      </select>
+      <button type="button" class="remove-topic">Remove</button>
+    `;
 
-      const [name, hours, priority] = parts;
-      return {
-        name,
-        hoursNeeded: Number(hours),
-        priority: String(priority || "medium").toLowerCase()
-      };
+    const nameInput = div.querySelector('input[data-field="name"]');
+    const hoursInput = div.querySelector('input[data-field="hoursNeeded"]');
+    const prioritySelect = div.querySelector('select[data-field="priority"]');
+    const removeBtn = div.querySelector(".remove-topic");
+
+    nameInput.addEventListener("change", (e) => {
+      const topicObj = topics.find((t) => t.id === topic.id);
+      if (topicObj) topicObj.name = e.target.value;
     });
+
+    hoursInput.addEventListener("change", (e) => {
+      const topicObj = topics.find((t) => t.id === topic.id);
+      if (topicObj) topicObj.hoursNeeded = Number(e.target.value);
+    });
+
+    prioritySelect.addEventListener("change", (e) => {
+      const topicObj = topics.find((t) => t.id === topic.id);
+      if (topicObj) topicObj.priority = e.target.value;
+    });
+
+    removeBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      topics = topics.filter((t) => t.id !== topic.id);
+      renderTopics();
+    });
+
+    topicsList.appendChild(div);
+  });
 }
 
 function renderJson(data) {
@@ -153,9 +188,24 @@ async function loadPerformance(goalId) {
 goalForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
+  if (topics.length === 0) {
+    formMessage.textContent = "Please add at least one topic";
+    return;
+  }
+
+  const invalidTopic = topics.find((t) => !t.name.trim() || !t.hoursNeeded || t.hoursNeeded <= 0);
+  if (invalidTopic) {
+    formMessage.textContent = "Each topic must have a name and positive hours needed";
+    return;
+  }
+
   const payload = {
     title: document.getElementById("title").value.trim(),
-    topics: parseTopicsInput(document.getElementById("topics").value),
+    topics: topics.map((t) => ({
+      name: t.name,
+      hoursNeeded: t.hoursNeeded,
+      priority: t.priority
+    })),
     totalDays: Number(document.getElementById("totalDays").value),
     hoursPerDay: Number(document.getElementById("hoursPerDay").value)
   };
@@ -170,7 +220,21 @@ goalForm.addEventListener("submit", async (event) => {
   formMessage.textContent = result.error || result.message || "Done";
   renderJson(result);
   goalForm.reset();
+  topics = [];
+  renderTopics();
   await fetchGoals();
+});
+
+addTopicBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  const newTopic = {
+    id: topicIdCounter++,
+    name: "",
+    hoursNeeded: 1,
+    priority: "medium"
+  };
+  topics.push(newTopic);
+  renderTopics();
 });
 
 refreshGoalsBtn.addEventListener("click", fetchGoals);
@@ -186,4 +250,5 @@ redistributeBtn.addEventListener("click", async () => {
   await fetchGoals();
 });
 
+renderTopics();
 fetchGoals();
