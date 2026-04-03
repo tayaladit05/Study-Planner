@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Study Planner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <h1>Study Planner</h1>
+
+    <section class="card">
+      <h2>Create Goal</h2>
+      <form id="goalForm">
+        <label>
+          Title
+          <input type="text" id="title" required />
+        </label>
+
+        <label>
+          Topics (one per line: Topic Name | Hours Needed | Priority)
+          <textarea id="topics" rows="6" required placeholder="Polity Basics | 4 | high&#10;History Modern | 3 | medium&#10;CSAT Practice | 2 | low"></textarea>
+        </label>
+
+        <label>
+          Total Days
+          <input type="number" id="totalDays" min="1" required />
+        </label>
+
+        <label>
+          Hours Per Day
+          <input type="number" id="hoursPerDay" min="1" step="0.5" required />
+        </label>
+
+        <button type="submit">Create Goal</button>
+      </form>
+      <p id="formMessage"></p>
+    </section>
+
+    <section class="card">
+      <h2>Goals</h2>
+      <button id="refreshGoals">Refresh Goals</button>
+      <div id="goalsList"></div>
+    </section>
+
+    <section class="card">
+      <h2>Selected Goal</h2>
+      <div id="selectedGoal">No goal selected.</div>
+      <div class="actions">
+        <button id="loadTasksBtn" disabled>Load Tasks</button>
+        <button id="loadTodayBtn" disabled>Load Today Tasks</button>
+        <button id="loadPerformanceBtn" disabled>Load Performance</button>
+        <button id="redistributeBtn" disabled>Redistribute</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Result</h2>
+      <div id="output">Nothing loaded yet.</div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

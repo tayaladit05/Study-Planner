@@ -17,7 +17,7 @@ const redistributeTasks = async (goalId, Task, Goal) => {
 
   // 2. Calculate remaining days from today to deadline
   const deadline = new Date(goal.deadline);
-  deadline.setHours(0, 0, 0, 0);
+  deadline.setUTCHours(0, 0, 0, 0);
 
   const remainingDays = Math.floor((deadline - today) / (1000 * 60 * 60 * 24)) + 1;
 

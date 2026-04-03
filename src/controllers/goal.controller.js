@@ -14,17 +14,45 @@ const createGoal = async (req, res) => {
     if (!Array.isArray(topics) || topics.length === 0)
       return res.status(400).json({ error: "Topics must be a non-empty array" });
 
+    if (Number(totalDays) <= 0 || Number(hoursPerDay) <= 0)
+      return res.status(400).json({ error: "totalDays and hoursPerDay must be greater than 0" });
+
     const startDate = new Date();
     const deadline = new Date();
     deadline.setDate(deadline.getDate() + totalDays - 1);
 
-    const goal = await Goal.create({ title, topics, totalDays, hoursPerDay, startDate, deadline });
+    const plan = generatePlan(
+      null,
+      topics,
+      startDate,
+      Number(totalDays),
+      Number(hoursPerDay)
+    );
 
-    // Auto generate daily plan
-    const taskData = generatePlan(goal._id, topics, startDate, totalDays, hoursPerDay);
-    await Task.insertMany(taskData);
+    if (!plan.summary.normalizedTopics.length)
+      return res.status(400).json({
+        error: "Each topic must include a valid name and positive hoursNeeded"
+      });
 
-    res.status(201).json({ message: "Goal created and plan generated", goal });
+    const goal = await Goal.create({
+      title,
+      topics: plan.summary.normalizedTopics,
+      totalDays: Number(totalDays),
+      hoursPerDay: Number(hoursPerDay),
+      startDate,
+      deadline
+    });
+
+    const taskData = plan.tasks.map((task) => ({ ...task, goalId: goal._id }));
+    if (taskData.length) await Task.insertMany(taskData);
+
+    res.status(201).json({
+      message: plan.summary.feasible
+        ? "Goal created and realistic plan generated"
+        : "Goal created with fallback plan. Some topics could not be fully scheduled.",
+      goal,
+      planSummary: plan.summary
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -2,7 +2,11 @@ const mongoose = require("mongoose");
 
 const goalSchema = new mongoose.Schema({
   title: { type: String, required: true },        // e.g. "Complete Polity"
-  topics: [{ type: String }],                     // ["Constitution", "Parliament", ...]
+  topics: [{
+    name: { type: String, required: true },
+    hoursNeeded: { type: Number, required: true, min: 0.25 },
+    priority: { type: String, enum: ["high", "medium", "low"], default: "medium" }
+  }],
   totalDays: { type: Number, required: true },     // e.g. 10
   hoursPerDay: { type: Number, required: true },   // e.g. 2
   startDate: { type: Date, default: Date.now },
